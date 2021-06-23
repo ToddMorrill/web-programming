@@ -1,7 +1,94 @@
-body {
+body, input, button {
+    font-size: 14px;
+    font-family: Roboto,arial,sans-serif;
+    color: #222;
+}
+
+a {
+    text-decoration: none;
+    font-size: 14px;
+    font-family: Roboto,arial,sans-serif;
+    color: #222;
+}
+
+.titlebar {
+    display: flex;
+    padding: 6px;
+    align-items: center;
+    height: 60px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.titlebar > a {
+    font-size: 14px;
+    font-family: Roboto,arial,sans-serif;
+    color: #222;
+}
+
+.titlebar_right_half {
+    display: inline-block;
+    flex-grow: 1;
+    height: 48px;
+}
+
+.titlebar_right_nested_container {
+    min-width: auto;
+    height: 48px;
+    position: relative;
+}
+
+.titlebar_right_items {
+    padding-left: 0;
+    float: right;
+    box-sizing: border-box;
+    height: 48px;
+    line-height: normal;
+    padding: 0 4px;
+    flex: 0 0 auto;
+    justify-content: flex-end;
+    vertical-align: middle;
+    white-space: nowrap;
+    align-items: center;
+    display: flex;
+}
+
+.titlebar_links_right {
+    line-height: normal;
+    white-space: nowrap;
+}
+
+.titlebar_links_nested_right {
+    font-family: arial,sans-serif;
+    line-height: normal;
+    padding-right: 15px;
+}
+
+.titlebar_right_link_texts {
+    display: inline-block;
+    padding-left: 15px;
+}
+
+.titlebar_right_link_text_item {
+    display: inline-block;
+    line-height: 24px;
+    vertical-align: middle;
+}
+
+a.titlebar_link:first-of-type {
+    margin-left: 15px;
+}
+
+a.titlebar_link {
+    display:inline-block;
+    padding: 5px;
+    margin:0 5px;
+}
+
+/* body {
     text-align: center;
     margin-top: 272px;
-}
+} */
 
 img {
     height: 92px;
@@ -39,4 +126,10 @@ img {
     text-align: center;
     cursor: pointer;
     user-select: none;
+}
+
+#titlebar {
+    display: flex;
+    align-items: center;
+    padding: 6px;
 }
