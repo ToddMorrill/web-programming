@@ -10,6 +10,17 @@ body, html {
     padding: 0;
 }
 
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 100%;
+    vertical-align: baseline;
+    text-decoration: none;
+}
+
 a {
     text-decoration: none;
     font-size: 14px;
@@ -250,6 +261,290 @@ img {
     text-align: center;
     cursor: pointer;
     user-select: none;
+}
+
+.logo_container_advanced_search {
+    padding-left: 12px;
+    height: 24px;
+    width: 74px;
+}
+
+.appbar {
+    color: #d93025;
+    font-size: 20px;
+    margin: 25px 35px;
+}
+
+.border {
+    border-bottom: 1px solid #ebebeb;
+}
+
+.complete_advanced_search {
+    max-width: 1140px;
+    min-width: 200px;
+    width: 96%;
+    margin: 40px 2% 0 45px;
+}
+
+.advanced_form_top_row div.otByu {
+    width: 100%;
+    clear: both;
+}
+
+div.yIQOUb {
+    clear: both;
+}
+
+div.I1Kbt {
+    float: left;
+    display: inline-block;
+    min-width: 167px;
+    width: 16%;
+    font-size: 16px;
+    min-height: 42px;
+    font-weight: 500;
+    color: #333;
+    vertical-align: middle;
+}
+
+div.lOTAE {
+    height: 30px;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+div.HoCfzc {
+    float: left;
+    display: inline-block;
+    min-width: 167px;
+    min-height: 41px;
+    vertical-align: middle;
+    width: 50%;
+}
+
+div.orcpGe {
+    float: left;
+    display: inline-block;
+    width: 33%;
+    font-size: 13px;
+    font-weight: 700;
+    color: #777;
+    padding-left: 5px;
+    vertical-align: middle;
+}
+
+div.otByu div.cwqNnb span.BFlQMb {
+    color: #666;
+    font-family: monospace;
+    font-size: 11px;
+    white-space: pre;
+}
+
+@media (max-width: 1056px) {
+div.orcpGe {
+    display: none !important;
+}
+}
+
+div.FAcADc {
+    float: left;
+    display: inline-block;
+    min-width: 167px;
+    width: 16%;
+    height: 42px;
+    color: #222;
+    font-size: 13px;
+    line-height: 16px;
+    vertical-align: middle;
+}
+
+div.otByu div.jYcx0e {
+    float: left;
+    display: inline-block;
+    min-width: 167px;
+    min-height: 41px;
+    vertical-align: middle;
+    width: 50%;
+}
+
+div.PLLUQc {
+    padding-right: 16px;
+}
+
+@media (max-width: 1056px) {
+div.cwqNnb {
+    display: none !important;
+}
+}
+
+div.otByu div.jYcx0e input[type="text"], div.otByu div.jYcx0e span.PnexQd {
+    width: 100%;
+    text-align: left;
+}
+
+div.otByu div.cwqNnb {
+    float: left;
+    display: inline-block;
+    width: 32%;
+    min-width: 160px;
+    margin: 0 0 8px 1%;
+    color: #555;
+    font-size: 11px;
+    padding-left: 5px;
+    vertical-align: middle;
+    position: relative;
+}
+
+.jfk-textinput {
+    border-radius: 1px;
+    border: 1px solid #d9d9d9;
+    border-top: 1px solid #c0c0c0;
+    font-size: 13px;
+    height: 25px;
+    padding: 1px 8px;
+}
+
+div.Qy8Xkb {
+    margin: 18px 0;
+    clear: both;
+    border-top: 1px solid #ebebeb;
+}
+
+.gGbPid {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    text-indent: 4px;
+}
+
+.goog-flat-menu-button {
+    border-radius: 2px;
+    background-color: #f5f5f5;
+    border: 1px solid #dcdcdc;
+    color: #444;
+    cursor: default;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 27px;
+    list-style: none;
+    min-width: 46px;
+    outline: none;
+    text-decoration: none;
+}
+
+.goog-inline-block {
+    position: relative;
+    display: inline-block;
+}
+
+.goog-flat-menu-button-dropdown {
+    border-color: #777 transparent;
+    border-style: solid;
+    border-width: 4px 4px 0;
+    height: 0;
+    width: 0;
+    position: absolute;
+    right: 5px;
+    top: 12px;
+}
+
+.ajf8pb {
+    max-height: 200px;
+    z-index: 12;
+    overflow: auto;
+}
+
+.goog-menu {
+    border-radius: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: opacity .218s;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.2);
+    cursor: default;
+    font-size: 13px;
+    margin: 0;
+    outline: none;
+    padding: 6px 0;
+    position: absolute;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+.jfk-scrollbar::-webkit-scrollbar {
+    height: 16px;
+    overflow: visible;
+    width: 16px;
+}
+
+.jfk-scrollbar::-webkit-scrollbar-button {
+    height: 0;
+    width: 0;
+}
+
+.jfk-scrollbar::-webkit-scrollbar {
+    height: 16px;
+    overflow: visible;
+    width: 16px;
+}
+
+.jfk-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+.jfk-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,.2);
+    background-clip: padding-box;
+    border: solid transparent;
+    border-width: 1px 1px 1px 6px;
+    min-height: 28px;
+    padding: 100px 0 0;
+    box-shadow: inset 1px 1px 0 rgba(0,0,0,.1),inset 0 -1px 0 rgba(0,0,0,.07);
+}
+
+.jfk-scrollbar::-webkit-scrollbar-track {
+    background-clip: padding-box;
+    border: solid transparent;
+    border-width: 0 0 0 4px;
+}
+
+.goog-menuitem, .goog-tristatemenuitem, .goog-filterobsmenuitem {
+    position: relative;
+    color: #333;
+    cursor: pointer;
+    list-style: none;
+    margin: 0;
+    padding: 6px 8em 6px 30px;
+    white-space: nowrap;
+}
+
+div.otByu div.yIQOUb input.dUBGpe {
+    float: right;
+    margin: 10px 0;
+}
+
+input.dUBGpe {
+    padding: 0 12px;
+}
+
+.jfk-button-action {
+    box-shadow: none;
+    background-color: #4d90fe;
+    background-image: linear-gradient(top,#4d90fe,#4787ed);
+    border: 1px solid #3079ed;
+    color: #fff;
+}
+
+.jfk-button {
+    border-radius: 2px;
+    cursor: default;
+    font-size: 11px;
+    font-weight: bold;
+    text-align: center;
+    white-space: nowrap;
+    outline: 0;
 }
 
 #test {
