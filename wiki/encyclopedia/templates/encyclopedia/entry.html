@@ -1,0 +1,10 @@
+{% extends "encyclopedia/layout.html" %}
+
+<!-- TODO: parametrize this title with page title -->
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block body %}
+    {{ entry|safe }}
+{% endblock %}
