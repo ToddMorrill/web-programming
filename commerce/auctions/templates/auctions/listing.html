@@ -1,0 +1,13 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}Listing{% endblock %}
+{% block body %}
+    <ul>
+        <li>Primary key: {{ listing.pk }}</li>
+        <li>Title: {{ listing.title }}</li>
+        <li>Description: {{ listing.description }}</li>
+        <li>Price: ${{ listing.price }}</li>
+        <li>Image: {{ listing.image_url }}</li>
+        <li>Category: {{ listing.category }}</li>
+    </ul>
+{% endblock %}
