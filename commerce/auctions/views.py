@@ -1,17 +1,20 @@
 from typing import List
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.db import IntegrityError
 from django.forms import ModelForm
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-from .models import Listing, User
+from .models import Listing, User, Listing, Watchlist
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    # get active listings
+    listings = Listing.objects.all()
+    return render(request, "auctions/index.html", {'listings': listings})
 
 
 def login_view(request):
@@ -72,6 +75,8 @@ class ListingForm(ModelForm):
 
 @login_required
 def create_listing(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
     if request.method == 'POST':
         # create form with data entered
         form = ListingForm(request.POST)
@@ -93,3 +98,19 @@ def create_listing(request):
 def listing(request, listing_id):
     listing_ = Listing.objects.get(pk=listing_id)
     return render(request, 'auctions/listing.html', {'listing': listing_})
+
+@login_required
+def watchlist(request, listing_id):
+    # TODO: notify user of success or failure
+    listing = get_object_or_404(Listing, pk=listing_id)
+    
+    # check if user has already added this item
+    if Watchlist.objects.filter(user=request.user, listing=listing_id).exists():
+        messages.add_message(request, messages.ERROR, "You have already added this item to your watchlist.")
+        return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
+    
+    # get watchlist for user, create it if it doesn't exist
+    user_watchlist, created = Watchlist.objects.get_or_create(user=request.user)
+    user_watchlist.listing.add(listing)
+    messages.add_message(request, messages.SUCCESS, "Successfully added this item to your watchlist.")
+    return HttpResponseRedirect(reverse('listing', args=(listing_id,)))

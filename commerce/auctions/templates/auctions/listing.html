@@ -10,4 +10,8 @@
         <li>Image: {{ listing.image_url }}</li>
         <li>Category: {{ listing.category }}</li>
     </ul>
+    <!-- Only show if user is logged in -->
+    {% if user.is_authenticated %}
+        <a href="{% url 'watchlist' listing.pk %}" role="button">Add to watchlist</a>
+    {% endif %}
 {% endblock %}

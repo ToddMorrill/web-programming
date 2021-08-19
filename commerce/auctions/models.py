@@ -9,14 +9,7 @@ from django.db import models
 
 
 class User(AbstractUser):
-    watchlist = models.CharField(max_length=256, blank=True)
-
-    def set_foo(self, x):
-        self.watchlist = json.dumps(x)
-
-    def get_watchlist(self):
-        return json.loads(self.watchlist)
-
+    pass
 
 class Listing(models.Model):
     lister = models.ForeignKey(User, on_delete=models.CASCADE, related_name='listings')
@@ -47,3 +40,10 @@ class Comment(models.Model):
 
     def __str__(self) -> str:
         return f'Comment {self.id} on {self.listing} by {self.commenter}'
+
+class Watchlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='watchlist_items')
+    listing = models.ManyToManyField(Listing, related_name='watchlist_users')
+
+    def __str__(self) -> str:
+        return f'Watchlist for user {self.user}'
