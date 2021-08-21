@@ -2,16 +2,45 @@
 
 {% block title %}Listing{% endblock %}
 {% block body %}
-    <ul>
-        <li>Primary key: {{ listing.pk }}</li>
-        <li>Title: {{ listing.title }}</li>
-        <li>Description: {{ listing.description }}</li>
-        <li>Price: ${{ listing.price }}</li>
-        <li>Image: {{ listing.image_url }}</li>
-        <li>Category: {{ listing.category }}</li>
-    </ul>
-    <!-- Only show if user is logged in -->
-    {% if user.is_authenticated %}
+<h2>{{ listing.title }}</h2>
+
+{% if listing.image_url %}
+    <div>
+        <img src="{{ listing.image_url }}" width=400 alt="Listing image">
+    </div>
+{% endif %}
+
+<div>
+    <b>Description:<br></b>
+    <p class="tab">{{ listing.description }}</p>
+</div>
+
+<div class="pad-below">
+    {% load humanize %}
+    <b>Current price:</b> ${{ listing.price|intcomma }}
+</div>
+
+<!-- Only show if user is logged in -->
+{% if user.is_authenticated %}
+    <!-- bid on item -->
+    <form action="{% url 'bid' listing.pk %}" method="post">
+        <div class="form-inline">
+            {% csrf_token %}
+            {{ form }}
+            <input type='submit' class="btn btn-primary pad above">
+        </div>
+    </form>
+
+    {% if message %}
+        <div class="alert alert-primary" role="alert">
+            {{ message }}
+        </div>
+    {% endif %}
+    
+    {% if on_watchlist %}
+        <a href="{% url 'watchlist' listing.pk %}" role="button">Remove from watchlist</a>
+    {% else %}
         <a href="{% url 'watchlist' listing.pk %}" role="button">Add to watchlist</a>
     {% endif %}
+{% endif %}
 {% endblock %}
