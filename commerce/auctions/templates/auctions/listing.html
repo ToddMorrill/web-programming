@@ -51,8 +51,18 @@
 
     <!-- close bidding -->
     {% if listing.lister == user %}
+        <!-- if auction not already closed -->
+        {% if not listing.winner %}
+            <div>
+                <a href="{% url 'close' listing.pk %}" role="button">Close bidding</a>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <!-- notify user if they are the winner -->
+    {% if listing.winner == user %}
         <div>
-            <a href="{% url 'close' listing.pk %}" role="button">Close bidding</a>
+            <h3 style="color: crimson;">Congratulations, you won the auction!</h3>
         </div>
     {% endif %}
 {% endif %}

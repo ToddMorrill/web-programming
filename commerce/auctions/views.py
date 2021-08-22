@@ -236,6 +236,10 @@ def close(request, listing_id):
     listing = Listing.objects.get(pk=listing_id)
     if request.user != listing.lister:
         return HttpResponse('401: Unauthorized', status=401)
+    if listing.winner:
+        message = f'This auction is already closed!'
+        request.session['message'] = message
+        return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
     # get the user with the highest bid
     # TODO: determine if there is better logic to do this
     listing_bids = Bid.objects.filter(listing=listing_id)
