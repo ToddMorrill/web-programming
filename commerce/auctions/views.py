@@ -3,13 +3,13 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import IntegrityError, models
-from django.forms import ModelForm
+from django.forms import ModelForm, HiddenInput
 from django.http import HttpResponse, HttpResponseRedirect
 
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-from .models import Listing, User, Listing, Watchlist, Bid
+from .models import Comment, Listing, User, Listing, Watchlist, Bid
 
 
 def index(request):
@@ -138,7 +138,19 @@ def listing(request, listing_id):
     context['on_watchlist'] = on_watchlist
 
     # create a bid form
-    context['form'] = BidForm
+    context['bid_form'] = BidForm
+
+    # get existing comment form if present
+    if 'comment' in request.session:
+        context['comment_form'] = request.session['comment']
+        # delete this message so it isn't accidentally used later
+        del request.session['comment']
+    else:
+        context['comment_form'] = CommentForm()
+
+    # get comments
+    comments = Comment.objects.filter(listing=listing_id)
+    context['comments'] = comments
     return render(request, 'auctions/listing.html', context)
 
 
@@ -252,3 +264,38 @@ def close(request, listing_id):
     listing.winner = max_record.bidder
     listing.save()
     return HttpResponseRedirect(reverse('listing', args=(listing_id, )))
+
+class CommentForm(ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['comment']
+        widgets = {'listing': HiddenInput(), 'commenter': HiddenInput()}
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+        self.fields['comment'].label = 'Enter your comment here'
+
+
+@login_required
+def comment(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    
+    if request.method == 'POST':
+        # create form with data entered
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.listing = Listing.objects.get(pk=request.POST['listing'])
+            instance.commenter = request.user
+            instance.save()
+            return HttpResponseRedirect(reverse('listing', args=(request.POST['listing'],)))
+        message = 'Something went wrong =(. Please check your comment.'
+        request.session['message'] = message
+        request.session['comment'] = form
+        return HttpResponseRedirect(reverse('listing', args=(request.POST['listing'],)))
+    
+    # return user to homepage if they use a get request
+    return HttpResponseRedirect(reverse('index'))

@@ -31,7 +31,7 @@
         <form action="{% url 'bid' listing.pk %}" method="post">
             <div class="form-inline">
                 {% csrf_token %}
-                {{ form }}
+                {{ bid_form }}
                 <input type='submit' class="btn btn-primary pad above">
             </div>
         </form>
@@ -66,4 +66,32 @@
         </div>
     {% endif %}
 {% endif %}
+
+<div>
+    {% if user.is_authenticated %}
+        <!-- add comment -->
+        <div>
+            <h4 class="pad-above">Add comment</h4>
+            <form action="{% url 'comment' %}" method="post">
+                <div class="form-group">
+                    {% csrf_token %}
+                    {{ comment_form }}
+                    <input type="hidden" name="listing" value="{{ listing.pk }}">
+                    <input type="hidden" name="commenter" value="{{ user }}">
+                    <input type="submit" class="btn btn-primary pad above">
+                </div>
+            </form>
+        </div>
+    {% endif %}
+    <hr>
+    {% for comment in comments %}
+        <div>
+            <b>{{ comment.commenter }}</b>
+            <div>
+                {{ comment.comment }}
+            </div>
+            <hr>
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}
