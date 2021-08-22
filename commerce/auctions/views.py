@@ -14,7 +14,7 @@ from .models import Listing, User, Listing, Watchlist, Bid
 
 def index(request):
     # get active listings
-    listings = Listing.objects.all()
+    listings = Listing.objects.filter(winner__isnull=True)
     # TODO: figure out how to join in all these max bids
     # get current bid prices
     highest_bids = Bid.objects.values('listing').annotate(highest_bid=models.Max('price'))
@@ -144,7 +144,7 @@ def listing(request, listing_id):
 
 @login_required
 def watchlist(request, listing_id):
-    # TODO: notify user of success or failure
+    # TODO: this should probably be converted to a form and POST request
     listing = get_object_or_404(Listing, pk=listing_id)
 
     # if user has already added this item, remove it
@@ -183,7 +183,15 @@ class BidForm(ModelForm):
 def bid(request, listing_id):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
+    
     if request.method == 'POST':
+        listing = Listing.objects.get(pk=listing_id)
+        # if winner already declared, notify user
+        if listing.winner:
+            message = f'This auction is closed!'
+            request.session['message'] = message
+            return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
+
         # create form with data entered
         form = BidForm(request.POST)
         if form.is_valid():
@@ -219,4 +227,24 @@ def bid(request, listing_id):
             'form': form,
             'message': message
         })
+    return HttpResponseRedirect(reverse('listing', args=(listing_id, )))
+
+@login_required
+def close(request, listing_id):
+    # TODO: this should probably be converted to a form and POST request
+    # confirm user is the lister
+    listing = Listing.objects.get(pk=listing_id)
+    if request.user != listing.lister:
+        return HttpResponse('401: Unauthorized', status=401)
+    # get the user with the highest bid
+    # TODO: determine if there is better logic to do this
+    listing_bids = Bid.objects.filter(listing=listing_id)
+    max_bid = 0
+    max_record = None
+    for record in listing_bids:
+        if record.price > max_bid:
+            max_bid = record.price
+            max_record = record
+    listing.winner = max_record.bidder
+    listing.save()
     return HttpResponseRedirect(reverse('listing', args=(listing_id, )))

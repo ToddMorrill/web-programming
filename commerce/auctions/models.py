@@ -17,10 +17,10 @@ class Listing(models.Model):
     title = models.CharField(max_length=256, unique=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=11, decimal_places=2, validators=[MinValueValidator(0)])
-    image_url = models.URLField(blank=True)
-    category = models.CharField(max_length=256, blank=True)
-    # listing_datetime = models.DateTimeField()
-
+    image_url = models.URLField()
+    category = models.CharField(max_length=256)
+    # if a winner is set, the auction is closed
+    winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bids_won', null=True, blank=True)
 
     def __str__(self) -> str:
         return f'{self.title}'

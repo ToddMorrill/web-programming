@@ -17,19 +17,25 @@
 
 <div class="pad-below">
     {% load humanize %}
-    <b>Current price:</b> ${{ listing.price|intcomma }}
+    {% if listing.winner %}
+        <b>This auction is closed and the item sold for:</b> ${{ listing.price|intcomma }}
+    {% else %}
+        <b>Current price:</b> ${{ listing.price|intcomma }}
+    {% endif %}    
 </div>
 
 <!-- Only show if user is logged in -->
 {% if user.is_authenticated %}
-    <!-- bid on item -->
-    <form action="{% url 'bid' listing.pk %}" method="post">
-        <div class="form-inline">
-            {% csrf_token %}
-            {{ form }}
-            <input type='submit' class="btn btn-primary pad above">
-        </div>
-    </form>
+    {% if not listing.winner %}
+        <!-- bid on item -->
+        <form action="{% url 'bid' listing.pk %}" method="post">
+            <div class="form-inline">
+                {% csrf_token %}
+                {{ form }}
+                <input type='submit' class="btn btn-primary pad above">
+            </div>
+        </form>
+    {% endif %}
 
     {% if message %}
         <div class="alert alert-primary" role="alert">
@@ -41,6 +47,13 @@
         <a href="{% url 'watchlist' listing.pk %}" role="button">Remove from watchlist</a>
     {% else %}
         <a href="{% url 'watchlist' listing.pk %}" role="button">Add to watchlist</a>
+    {% endif %}
+
+    <!-- close bidding -->
+    {% if listing.lister == user %}
+        <div>
+            <a href="{% url 'close' listing.pk %}" role="button">Close bidding</a>
+        </div>
     {% endif %}
 {% endif %}
 {% endblock %}
