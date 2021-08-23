@@ -18,10 +18,24 @@ class Listing(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=11, decimal_places=2, validators=[MinValueValidator(0)])
     image_url = models.URLField()
-    category = models.CharField(max_length=256)
     # if a winner is set, the auction is closed
     winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bids_won', null=True, blank=True)
     watchlist_users = models.ManyToManyField(User, related_name='watchlist_listings')
+
+    # define category choices
+    ELECTRIONICS = 'EL'
+    PETS = 'PT'
+    HOUSEHOLD = 'HS'
+    MISCELLANEOUS = 'MS'
+    CATEGORIES = [
+        (ELECTRIONICS, 'Electronics'),
+        (PETS, 'Pets'),
+        (HOUSEHOLD, 'Household'),
+        (MISCELLANEOUS, 'Miscellaneous')]
+    category = models.CharField(max_length=2,
+        choices=CATEGORIES,
+        default=MISCELLANEOUS,
+    )
 
     def __str__(self) -> str:
         return f'{self.title}'

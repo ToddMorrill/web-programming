@@ -26,11 +26,13 @@ def current_prices(listings):
         updated_listings.append(listing_)
     return updated_listings
 
+
 def index(request):
     # get active listings
     listings = Listing.objects.filter(winner__isnull=True)
     updated_listings = current_prices(listings)
-    return render(request, "auctions/index.html", {'listings': updated_listings})
+    return render(request, "auctions/index.html",
+                  {'listings': updated_listings})
 
 
 def login_view(request):
@@ -140,7 +142,8 @@ def listing(request, listing_id):
     context['listing'] = listing_
 
     # check if user has this listing on their watchlist
-    on_watchlist = request.user.watchlist_listings.filter(pk=listing_id).exists()
+    on_watchlist = request.user.watchlist_listings.filter(
+        pk=listing_id).exists()
     context['on_watchlist'] = on_watchlist
 
     # create a bid form
@@ -325,3 +328,20 @@ def watchlist(request, user_id):
     updated_user_watchlist = current_prices(user_watchlist)
     return render(request, 'auctions/watchlist.html',
                   {'watchlist': updated_user_watchlist})
+
+
+def categories(request):
+    # get list of categories
+    categories = Listing.CATEGORIES
+    return render(request, 'auctions/categories.html',
+                  {'categories': categories})
+
+
+def category(request, category_id):
+    listings = Listing.objects.filter(category=category_id)
+    category = Listing(category=category_id).get_category_display()
+    updated_listings = current_prices(listings)
+    return render(request, 'auctions/category.html', {
+        'listings': updated_listings,
+        'category': category
+    })
