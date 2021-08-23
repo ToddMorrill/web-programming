@@ -44,9 +44,9 @@
     {% endif %}
     
     {% if on_watchlist %}
-        <a href="{% url 'watchlist' listing.pk %}" role="button">Remove from watchlist</a>
+        <a href="{% url 'add_watchlist' listing.pk %}" role="button">Remove from watchlist</a>
     {% else %}
-        <a href="{% url 'watchlist' listing.pk %}" role="button">Add to watchlist</a>
+        <a href="{% url 'add_watchlist' listing.pk %}" role="button">Add to watchlist</a>
     {% endif %}
 
     <!-- close bidding -->

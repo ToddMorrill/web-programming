@@ -21,10 +21,10 @@ class Listing(models.Model):
     category = models.CharField(max_length=256)
     # if a winner is set, the auction is closed
     winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bids_won', null=True, blank=True)
+    watchlist_users = models.ManyToManyField(User, related_name='watchlist_listings')
 
     def __str__(self) -> str:
         return f'{self.title}'
-
 
 class Bid(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='bids')
@@ -42,9 +42,9 @@ class Comment(models.Model):
     def __str__(self) -> str:
         return f'Comment {self.id} on {self.listing} by {self.commenter}'
 
-class Watchlist(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='watchlist_items')
-    listing = models.ManyToManyField(Listing, related_name='watchlist_users')
+# class Watchlist(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='watchlist_items')
+#     listings = models.ManyToManyField(Listing, related_name='watchlist_users')
 
-    def __str__(self) -> str:
-        return f'Watchlist for user {self.user}'
+#     def __str__(self) -> str:
+#         return f'Watchlist for user {self.user}'
