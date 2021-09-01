@@ -1,0 +1,11 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>{{ category}}</h2>
+    {% load humanize %}
+    {% for listing in listings %}
+        <div>
+            <a href="{% url 'listing' listing.pk %}">{{ listing.title }}</a> - ${{ listing.price|intcomma }}
+        </div>
+    {% endfor %}
+{% endblock %}
