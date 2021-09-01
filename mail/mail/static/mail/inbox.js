@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // is this where we want to install the form.onsubmit listener?
   document.querySelector('form').onsubmit = function() {
     const recipients = document.querySelector('#compose-recipients').value
-    const subject = document.querySelector('#compose-subject')
-    const body = document.querySelector('#compose-body')
+    const subject = document.querySelector('#compose-subject').value
+    const body = document.querySelector('#compose-body').value
     fetch('/emails', {
       method: 'POST',
       body: JSON.stringify({
@@ -46,6 +46,50 @@ function compose_email() {
   
 }
 
+function email_entry(mailbox, email) {
+    // create div objects for each of the emails
+    const div = document.createElement('div');
+    div.setAttribute('class', 'border rounded email');
+
+    // create inner divs
+    const names = document.createElement('div');
+    names.setAttribute('class', 'email-components names');
+    const subject = document.createElement('div');
+    subject.setAttribute('class', 'email-components subject');
+    const timestamp = document.createElement('div');
+    timestamp.setAttribute('class', 'email-components timestamp');
+
+    if (mailbox === 'sent') {
+      names.innerHTML = email.recipients;
+      subject.innerHTML = email.subject;
+      timestamp.innerHTML = email.timestamp;
+      div.append(names);
+      div.append(subject);
+      div.append(timestamp);
+    }
+    else {
+      // inbox and archive
+      names.innerHTML = email.sender
+      subject.innerHTML = email.subject
+      timestamp.innerHTML = email.timestamp
+      div.append(names);
+      div.append(subject);
+      div.append(timestamp);
+
+      // add formatting based on read status
+      if (email.read) {
+        div.setAttribute('class', 'border rounded email read');
+      }
+      else {
+        div.setAttribute('class', 'border rounded email unread');
+      }
+
+    } 
+
+      
+    document.querySelector('#emails-view').append(div)
+}
+
 function load_mailbox(mailbox) {
   
   // Show the mailbox and hide other views
@@ -54,4 +98,16 @@ function load_mailbox(mailbox) {
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  // create placeholder unordered list
+  // const ul = document.createElement('ul', id='emails-list')
+  // ul.setAttribute('id', 'emails-list');
+  // document.querySelector('#emails-view').append(ul)
+
+  // Load the appropriate mailbox
+  fetch(`/emails/${mailbox}`)
+  .then(response => response.json())
+  .then(response => {
+    response.forEach(email_entry.bind(null, mailbox))
+  })
 }
