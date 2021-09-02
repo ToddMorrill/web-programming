@@ -47,13 +47,16 @@ function compose_email() {
 
 }
 
-function view_email(email) {
+function view_email(mailbox, email) {
+  // placeholder for html elements
+  var elements = [];
+
   // Mark the email as read
   fetch(`/emails/${email.id}`, {
     method: 'PUT',
     body: JSON.stringify({
       read: true
-  })
+    })
   })
   
   // clear any existing content
@@ -66,26 +69,66 @@ function view_email(email) {
 
   const from = document.createElement('div');
   from.innerHTML = `<b>From:</b> ${email.sender}`;
+  elements.push(from)
   const to = document.createElement('div');
   to.innerHTML = `<b>To:</b> ${email.recipients}`;
+  elements.push(to)
   const subject = document.createElement('div');
   subject.innerHTML = `<b>Subject:</b> ${email.subject}`;
+  elements.push(to)
   const timestamp = document.createElement('div');
   timestamp.innerHTML = `<b>Timestamp:</b> ${email.timestamp}`;
+  elements.push(timestamp)
 
-  // add in reply button and line across page
+  // add in reply button and (un)archive button
+  // const button_div = document.createElement('div');
+  // button_div.setAttribute('id', 'button-div');
   const reply = document.createElement('button');
   reply.textContent = 'Reply';
   reply.setAttribute('class', 'btn btn-sm btn-outline-primary');
+  elements.push(reply)
   // add event listener to the button
   reply.onclick = function() {}
+  if (mailbox != 'sent') {
+    // add archive button if inbox or archive
+    const archive = document.createElement('button');
+    archive.setAttribute('class', 'btn btn-sm btn-outline-primary');
+    if (email.archived) {
+      archive.textContent = 'Unarchive';
+      archive.onclick = function() {
+        fetch(`/emails/${email.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            archived: false
+          })
+        });
+        // send user to their inbox and return
+        return load_mailbox('inbox')
+      }
+    }
+    else {
+      archive.textContent = 'Archive';
+      archive.onclick = function() {
+        fetch(`/emails/${email.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            archived: true
+          })
+        });
+        return load_mailbox('inbox')
+      }
+    }
+    elements.push(archive)
+  }
   
   const line = document.createElement('hr')
+  elements.push(line)
 
   const body = document.createElement('div');
   body.innerHTML = email.body
+  elements.push(body)
 
-  document.querySelector('#email-view').append(from, to, subject, timestamp, reply, line, body)
+  document.querySelector('#email-view').append(...elements)
 
 }
 
@@ -133,7 +176,7 @@ function email_entry(mailbox, email) {
   div.onclick = function () {
     fetch(`/emails/${email.id}`)
       .then(response => response.json())
-      .then(view_email)
+      .then(view_email.bind(null, mailbox))
   }
 
   document.querySelector('#emails-view').append(div)
