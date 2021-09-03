@@ -47,6 +47,22 @@ function compose_email() {
 
 }
 
+function compose_reply(email) {
+  // clear existing elements
+  compose_email()
+
+  // Pre-fill composition fields
+  document.querySelector('#compose-recipients').value = email.sender;
+  var subject = email.subject;
+  if (!subject.startsWith('Re: ')) {
+    subject = 'Re: ' + subject
+  }
+  document.querySelector('#compose-subject').value = subject;
+  var body = `On ${email.timestamp} ${email.sender} wrote:\n${email.body}`
+  document.querySelector('#compose-body').value = body;
+
+}
+
 function view_email(mailbox, email) {
   // placeholder for html elements
   var elements = [];
@@ -88,7 +104,7 @@ function view_email(mailbox, email) {
   reply.setAttribute('class', 'btn btn-sm btn-outline-primary');
   elements.push(reply)
   // add event listener to the button
-  reply.onclick = function() {}
+  reply.onclick = function() {compose_reply(email);}
   if (mailbox != 'sent') {
     // add archive button if inbox or archive
     const archive = document.createElement('button');
