@@ -12,12 +12,11 @@ class User(AbstractUser):
 class Post(models.Model):
     poster = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     post = models.CharField(max_length=280)
+    created = models.DateTimeField(auto_now_add=True)
+    likers = models.ManyToManyField(User, related_name='liked_posts')
 
     def __str__(self) -> str:
         return f'Post {self.id} by {self.poster}'
-
-class Like(models.Model):
-    pass
 
 class Follower(models.Model):
     pass

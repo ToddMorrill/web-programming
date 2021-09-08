@@ -14,6 +14,10 @@ def index(request):
     if request.user.is_authenticated:
         form = PostForm()
         context['form'] = form
+    
+    # get posts from database
+    posts = Post.objects.all()
+    context['posts'] = posts
     return render(request, "network/index.html", context)
 
 
@@ -82,7 +86,7 @@ class PostForm(ModelForm):
         self.fields['post'].label = ''
 
 @login_required
-def posts(request):
+def post(request):
     # process POST request
     if request.method == 'POST':
         # create form with data entered

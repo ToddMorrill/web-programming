@@ -8,15 +8,27 @@
                 {{ message }}
             </div>
         {% endif %}
-        <div class='border rounded' id='post-form'>
+        <div class='border rounded mt-2 p-2' id='post-form'>
             <h5>New Post</h5>
-            <form action="{% url 'posts' %}" method="post">
+            <form action="{% url 'post' %}" method="post">
                 <div class="form-group">
                     {% csrf_token %}
                     {{ form }}
-                    <input type='submit' class="btn btn-primary pad-above" value="Post">
+                    <input type='submit' class="btn btn-primary mt-2" value="Post">
                 </div>
             </form>
         </div>
     {% endif %}
+
+    {% for post in posts %}
+        <div class='border rounded mt-2 p-2'>
+            <h5>{{ post.poster }}</h5>
+            Edit<br>
+            {{ post.post }}<br>
+            {{ post.created }}<br>
+            Like count (add heart emoji): 0<br>
+            Comment
+        </div>
+    {% endfor %}
+    <hr>
 {% endblock %}
