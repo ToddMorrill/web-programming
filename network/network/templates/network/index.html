@@ -1,0 +1,22 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <h2>All Posts</h2>
+    {% if user.is_authenticated %}
+        {% if message %}
+            <div class="alert alert-primary" role="alert">
+                {{ message }}
+            </div>
+        {% endif %}
+        <div class='border rounded' id='post-form'>
+            <h5>New Post</h5>
+            <form action="{% url 'posts' %}" method="post">
+                <div class="form-group">
+                    {% csrf_token %}
+                    {{ form }}
+                    <input type='submit' class="btn btn-primary pad-above" value="Post">
+                </div>
+            </form>
+        </div>
+    {% endif %}
+{% endblock %}
