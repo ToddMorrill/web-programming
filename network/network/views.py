@@ -4,10 +4,12 @@ from django.db import IntegrityError
 from django.forms import ModelForm, HiddenInput
 from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models import Count
+from django.http.response import JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
-from .models import User, Post
+from .models import User, Post, Follower
 
 
 def index(request):
@@ -15,9 +17,9 @@ def index(request):
     if request.user.is_authenticated:
         form = PostForm()
         context['form'] = form
-    
+
     # get posts from database
-    posts = Post.objects.all().annotate(likes=Count('likers'))
+    posts = Post.objects.all().annotate(likes=Count('likers')).order_by('-created')
     context['posts'] = posts
     return render(request, "network/index.html", context)
 
@@ -35,9 +37,8 @@ def login_view(request):
             login(request, user)
             return HttpResponseRedirect(reverse("index"))
         else:
-            return render(request, "network/login.html", {
-                "message": "Invalid username and/or password."
-            })
+            return render(request, "network/login.html",
+                          {"message": "Invalid username and/or password."})
     else:
         return render(request, "network/login.html")
 
@@ -56,18 +57,16 @@ def register(request):
         password = request.POST["password"]
         confirmation = request.POST["confirmation"]
         if password != confirmation:
-            return render(request, "network/register.html", {
-                "message": "Passwords must match."
-            })
+            return render(request, "network/register.html",
+                          {"message": "Passwords must match."})
 
         # Attempt to create new user
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
         except IntegrityError:
-            return render(request, "network/register.html", {
-                "message": "Username already taken."
-            })
+            return render(request, "network/register.html",
+                          {"message": "Username already taken."})
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
     else:
@@ -86,6 +85,7 @@ class PostForm(ModelForm):
             field.widget.attrs['class'] = 'form-control'
         self.fields['post'].label = ''
 
+
 @login_required
 def post(request):
     # process POST request
@@ -98,14 +98,14 @@ def post(request):
             instance.poster = request.user
             # enter listing into database
             instance.save()
-            return HttpResponseRedirect(
-                reverse('index'))
+            return HttpResponseRedirect(reverse('index'))
         message = 'Something went wrong =(. Please check your form data.'
         return render(request, "network/index.html", {
             'form': form,
             'message': message
         })
     return render(request, "network/index.html", {'form': PostForm()})
+
 
 def user(request, user_id):
     context = {}
@@ -116,15 +116,42 @@ def user(request, user_id):
     context['user_'] = user
     context['followers_count'] = user.followers.count()
     context['following_count'] = user.following.count()
-    context['posts'] = user.posts.order_by('-created').annotate(likes=Count('likers'))
+    context['posts'] = user.posts.order_by('-created').annotate(
+        likes=Count('likers'))
     # check if the user is already following this person
     if user.is_authenticated:
-        following = user.followers.filter(pk=user_id).exists()
+        following = user.followers.filter(follower=request.user).exists()
         context['following'] = following
     return render(request, "network/user.html", context)
 
+# TODO: fix this
+@csrf_exempt
 def follow(request, user_id):
-    # check for a post request
+    # check for a PUT request
+    if request.method != 'PUT':
+        return JsonResponse({"error": "PUT request required."}, status=400)
     # ensure user.id != user_id
-    # add entry to database
-    pass
+    if request.user.id == int(user_id):
+        return JsonResponse({"error": "You cannot follow yourself."},
+                            status=400)
+
+    # retrieve users
+    followed = User.objects.filter(pk=int(user_id))
+    follower = User.objects.filter(pk=request.user.id)
+    if not (followed.exists() and follower.exists()):
+        return JsonResponse({"error": "These users do not exist."}, status=400)
+    else:
+        followed = followed[0]
+        follower = follower[0]
+
+    # if follow link is in the database, remove it
+    action = None
+    if Follower.objects.filter(followed=followed, follower=follower).exists():
+        Follower.objects.filter(followed=followed, follower=follower).delete()
+        action = 'Unfollowed'
+    # else add it
+    else:
+        Follower.objects.create(followed=followed,
+                                follower=follower)
+        action = 'Followed'
+    return JsonResponse({'action': action}, status=200)

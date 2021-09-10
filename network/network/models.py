@@ -31,4 +31,4 @@ class Follower(models.Model):
                                     related_name='following')
     created = models.DateTimeField(auto_now_add=True)
     class Meta:
-        unique_together = ('followed_id', 'follower_id',)
+        unique_together = ('followed', 'follower',)
