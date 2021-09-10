@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.forms import ModelForm, HiddenInput
 from django.http import HttpResponse, HttpResponseRedirect
+from django.db.models import Count
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -16,7 +17,7 @@ def index(request):
         context['form'] = form
     
     # get posts from database
-    posts = Post.objects.all()
+    posts = Post.objects.all().annotate(likes=Count('likers'))
     context['posts'] = posts
     return render(request, "network/index.html", context)
 
@@ -105,3 +106,25 @@ def post(request):
             'message': message
         })
     return render(request, "network/index.html", {'form': PostForm()})
+
+def user(request, user_id):
+    context = {}
+    try:
+        user = User.objects.get(pk=user_id)
+    except:
+        return HttpResponseRedirect(reverse('index'))
+    context['user_'] = user
+    context['followers_count'] = user.followers.count()
+    context['following_count'] = user.following.count()
+    context['posts'] = user.posts.order_by('-created').annotate(likes=Count('likers'))
+    # check if the user is already following this person
+    if user.is_authenticated:
+        following = user.followers.filter(pk=user_id).exists()
+        context['following'] = following
+    return render(request, "network/user.html", context)
+
+def follow(request, user_id):
+    # check for a post request
+    # ensure user.id != user_id
+    # add entry to database
+    pass

@@ -22,11 +22,11 @@
 
     {% for post in posts %}
         <div class='border rounded mt-2 p-2'>
-            <h5>{{ post.poster }}</h5>
+            <h5><a href="{% url 'user' post.poster.id %}">{{ post.poster }}</a></h5>
             Edit<br>
             {{ post.post }}<br>
             {{ post.created }}<br>
-            Like count (add heart emoji): 0<br>
+            Like count (add heart emoji): {{ post.likes }}<br>
             Comment
         </div>
     {% endfor %}
