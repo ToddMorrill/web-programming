@@ -173,3 +173,20 @@ def follow(request, user_id):
                                 follower=follower)
         action = 'Followed'
     return JsonResponse({'action': action}, status=200)
+
+@login_required
+def following(request):
+    # get following list
+    # TODO: determine if there is a better way to retrieve the actual users
+    following_list = request.user.following.all().values_list('followed', flat=True)
+    following_list = User.objects.filter(id__in=following_list)
+    context = {}
+    page_num = request.GET.get('page')
+    if page_num is None:
+        page_num = 1
+    # get posts from these users
+    posts = Post.objects.filter(poster__in=following_list).annotate(likes=Count('likers')).order_by('-created')
+    posts_paginator = Paginator(posts, 10)
+    page = posts_paginator.get_page(page_num)
+    context['page'] = page
+    return render(request, "network/following.html", context)
