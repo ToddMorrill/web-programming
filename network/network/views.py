@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.forms import ModelForm, HiddenInput
 from django.http import HttpResponse, HttpResponseRedirect
@@ -18,9 +19,14 @@ def index(request):
         form = PostForm()
         context['form'] = form
 
+    page_num = request.GET.get('page')
+    if page_num is None:
+        page_num = 1
     # get posts from database
     posts = Post.objects.all().annotate(likes=Count('likers')).order_by('-created')
-    context['posts'] = posts
+    posts_paginator = Paginator(posts, 10)
+    page = posts_paginator.get_page(page_num)
+    context['page'] = page
     return render(request, "network/index.html", context)
 
 
@@ -84,6 +90,7 @@ class PostForm(ModelForm):
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
         self.fields['post'].label = ''
+        self.fields['post'].widget.attrs.update({'autofocus': 'autofocus'})
 
 
 @login_required
@@ -116,12 +123,23 @@ def user(request, user_id):
     context['user_'] = user
     context['followers_count'] = user.followers.count()
     context['following_count'] = user.following.count()
-    context['posts'] = user.posts.order_by('-created').annotate(
+
+    # TODO: should really factor out this functionality because it's used in
+    # multiple places
+    page_num = request.GET.get('page')
+    if page_num is None:
+        page_num = 1
+    # get posts from database
+    posts = user.posts.order_by('-created').annotate(
         likes=Count('likers'))
+    posts_paginator = Paginator(posts, 10)
+    page = posts_paginator.get_page(page_num)
+    context['page'] = page
     # check if the user is already following this person
     if user.is_authenticated:
         following = user.followers.filter(follower=request.user).exists()
         context['following'] = following
+    # breakpoint()
     return render(request, "network/user.html", context)
 
 # TODO: fix this

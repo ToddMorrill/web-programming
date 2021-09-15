@@ -20,7 +20,7 @@
         </div>
     {% endif %}
 
-    {% for post in posts %}
+    {% for post in page.object_list %}
         <div class='border rounded mt-2 p-2'>
             <h5><a href="{% url 'user' post.poster.id %}">{{ post.poster }}</a></h5>
             Edit<br>
@@ -30,5 +30,15 @@
             Comment
         </div>
     {% endfor %}
+
+    <div class="page-links">
+        {% if page.has_previous %}
+            <a href="{% url 'index' %}?page={{ page.previous_page_number }}">Previous Page</a>
+        {% endif %}
+        {% if page.has_next %}
+            <a href="{% url 'index' %}?page={{ page.next_page_number }}">Next Page</a>
+        {% endif %}
+        
+    </div>
     <hr>
 {% endblock %}
