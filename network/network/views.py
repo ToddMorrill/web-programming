@@ -1,7 +1,10 @@
+import json
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import IntegrityError
+from django.db.models.expressions import Subquery
 from django.forms import ModelForm, HiddenInput
 from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models import Count
@@ -24,6 +27,9 @@ def index(request):
         page_num = 1
     # get posts from database
     posts = Post.objects.all().annotate(likes=Count('likers')).order_by('-created')
+    # TODO: is there a better way to check if request.user liked the post?
+    for post in posts:
+        post.liked = request.user in post.likers.all()
     posts_paginator = Paginator(posts, 10)
     page = posts_paginator.get_page(page_num)
     context['page'] = page
@@ -113,7 +119,38 @@ def post(request):
         })
     return render(request, "network/index.html", {'form': PostForm()})
 
+@csrf_exempt
+@login_required
+def edit_post(request):
+    if request.method != 'POST':
+        return JsonResponse({"error": f"Method Not Allowed."},
+                            status=405)
+    received_json_data = json.loads(request.body)
+    post_id = received_json_data.get('post_id')
+    # get existing post (if it exists) and edit it
+    if post_id is None:
+        return JsonResponse({"error": f"Post not found."},
+                            status=404)
+    # if post exists, retrieve it
+    post = Post.objects.filter(pk=int(post_id))
+    if post.exists():
+        post = post[0]
+    else:
+        return JsonResponse({"error": f"Post {post_id} not found."},
+                            status=404)
+    # if request.user == poster, allow them to edit
+    if request.user == post.poster:
+        post.post = received_json_data.get('post')
+        post.save()
+        return JsonResponse({"message": "Post updated successfully."},
+                            status=200)
+    else:
+        return JsonResponse({"error": f"User does not have permission to edit post {post_id}."},
+                            status=401)
+    
+    
 
+    
 def user(request, user_id):
     context = {}
     try:
@@ -132,6 +169,9 @@ def user(request, user_id):
     # get posts from database
     posts = user.posts.order_by('-created').annotate(
         likes=Count('likers'))
+    # TODO: is there a better way to check if request.user liked the post?
+    for post in posts:
+        post.liked = request.user in post.likers.all()
     posts_paginator = Paginator(posts, 10)
     page = posts_paginator.get_page(page_num)
     context['page'] = page
@@ -186,7 +226,39 @@ def following(request):
         page_num = 1
     # get posts from these users
     posts = Post.objects.filter(poster__in=following_list).annotate(likes=Count('likers')).order_by('-created')
+    # TODO: is there a better way to check if request.user liked the post?
+    for post in posts:
+        post.liked = request.user in post.likers.all()
     posts_paginator = Paginator(posts, 10)
     page = posts_paginator.get_page(page_num)
     context['page'] = page
     return render(request, "network/following.html", context)
+
+@csrf_exempt
+@login_required
+def like(request):
+    if request.method != 'PUT':
+        return JsonResponse({"error": f"Method Not Allowed."},
+                            status=405)
+    received_json_data = json.loads(request.body)
+    post_id = received_json_data.get('post_id')
+    # get existing post (if it exists) and edit it
+    if post_id is None:
+        return JsonResponse({"error": f"Post not found."},
+                            status=404)
+    # if post exists, retrieve it
+    post = Post.objects.filter(pk=int(post_id))
+    if post.exists():
+        post = post[0]
+    else:
+        return JsonResponse({"error": f"Post {post_id} not found."},
+                            status=404)
+    # if request.user == poster, allow them to edit
+    if request.user in post.likers.all():
+        post.likers.remove(request.user)
+        return JsonResponse({"action": "Unliked."},
+                        status=200)
+    else:
+        post.likers.add(request.user)
+        return JsonResponse({"action": "Liked."},
+                        status=200)

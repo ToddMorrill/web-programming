@@ -1,4 +1,9 @@
 {% extends "network/layout.html" %}
+{% load static %}
+
+{% block script %}
+    <script src="{% static 'network/user.js' %}"></script>
+{% endblock %}
 
 {% block body %}
     <h2>All Posts</h2>
@@ -23,11 +28,31 @@
     {% for post in page.object_list %}
         <div class='border rounded mt-2 p-2'>
             <h5><a href="{% url 'user' post.poster.id %}">{{ post.poster }}</a></h5>
-            Edit<br>
-            {{ post.post }}<br>
+            {% if post.poster == user %}
+            <div class="edit-post">
+                <button data-post="{{ post.id }}" class="btn btn-primary mt-2 edit-post-button">Edit</button>
+            </div>
+            {% endif %}
+            <div class="post-text" data-posttext="{{ post.id }}">
+                {{ post.post }}
+            </div>
             {{ post.created }}<br>
-            Like count (add heart emoji): {{ post.likes }}<br>
-            Comment
+            <div class="like">
+                {% if post.liked %}
+                    <div class="heart-emoji" data-post="{{ post.id }}" style="display:inline-block;">
+                        <!-- broken heart -->
+                        &#x1F494;
+                    </div>
+                {% else %}
+                    <div class="heart-emoji" data-post="{{ post.id }}" style="display:inline-block;">
+                        <!-- red heart -->
+                        &#x2764;
+                    </div>
+                {% endif %}
+                <div class="like-count" data-post="{{ post.id }}" style="display:inline-block;">
+                    {{ post.likes }}
+                </div>
+            </div>
         </div>
     {% endfor %}
 
